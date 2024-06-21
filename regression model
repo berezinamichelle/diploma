@@ -1,0 +1,54 @@
+import pandas as pd
+import statsmodels.api as sm
+from statsmodels.iolib.summary2 import summary_col
+
+# Загрузка данных
+data = pd.read_excel('diploma_data_dates.xlsx')
+
+# Подготовка данных
+X1 = data[['Ecosystem', 'Digitalization_Level', 'Ecosystem_level']]
+X2 = data[['Ecosystem', 'Ecosystem_level', 'Customers (mil)', 'Digitalization_Level', 'Deposits (mil)']]
+X3 = data[['Digitalization_Level', 'Ecosystem_level', 'Ecosystem', 'Customers (mil)', 'Deposits (mil)']]
+X4 = data[['Digitalization_Level', 'Ecosystem_level', 'Ecosystem', 'Customers (mil)', 'Deposits (mil)']]
+X5 = data[['Ecosystem', 'Ecosystem_level', 'Customers (mil)', 'Digitalization_Level']]
+y1 = data['Customers (mil)']
+y2 = data['Profit (mil)']
+y3 = data['ROA']
+y4 = data['ROE']
+y5 = data['Deposits (mil)']
+
+# Добавление константы
+X1 = sm.add_constant(X1)
+X2 = sm.add_constant(X2)
+X3 = sm.add_constant(X3)
+X4 = sm.add_constant(X4)
+X5 = sm.add_constant(X5)
+
+# Создание моделей
+model1 = sm.OLS(y1, X1).fit(cov_type='HC3')
+model2 = sm.OLS(y2, X2).fit(cov_type='HC3')
+model3 = sm.OLS(y3, X3).fit(cov_type='HC3')
+model4 = sm.OLS(y4, X4).fit(cov_type='HC3')
+model5 = sm.OLS(y5, X5).fit(cov_type='HC3')
+
+# Получение результатов
+results1 = model1.summary()
+results2 = model2.summary()
+results3 = model3.summary()
+results4 = model4.summary()
+results5 = model5.summary()
+
+# Печать результатов
+print(results1)
+print(results2)
+print(results3)
+print(results4)
+print(results5)
+
+# Сравнение моделей
+dfoutput = summary_col([model1, model2, model3, model4, model5], stars=True, float_format='%0.2f',
+                       model_names=['Model 1', 'Model 2', 'Model 3', 'Model 4', 'Model 5'],
+                       info_dict={'R-squared': lambda x: "{:.2f}".format(x.rsquared),
+                                  'Adj. R-squared': lambda x: "{:.2f}".format(x.rsquared_adj)})
+
+print(dfoutput)
